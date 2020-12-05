@@ -24,17 +24,27 @@
  */
 package org.spongepowered.common.accessor.world.server;
 
-import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.server.ServerChunkProvider;
-import net.minecraft.world.server.TicketManager;
+import net.minecraft.world.server.Ticket;
+import net.minecraft.world.server.TicketType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
+import org.spongepowered.asm.mixin.gen.Invoker;
+import sun.jvm.hotspot.utilities.AssertionFailure;
 
-@Mixin(ServerChunkProvider.class)
-public interface ServerChunkProviderAccessor {
+@Mixin(Ticket.class)
+public interface TicketAccessor<T> {
 
-    @Accessor("generator") void accessor$setChunkGenerator(ChunkGenerator<?> generator);
+    @Invoker("<init>")
+    static <T> Ticket<T> accessor$createInstance(final TicketType<T> p_i226095_1_, final int p_i226095_2_, final T p_i226095_3_) {
+        throw new AssertionFailure("This shouldn't be callable");
+    }
 
-    @Accessor("ticketManager") TicketManager accessor$getTicketManager();
+    @Accessor("timestamp") long accessor$getTimestamp();
+
+    @Accessor("value") T accessor$getValue();
+
+    @Invoker("isExpired") boolean accessor$isExpired(long currentTimestamp);
+
+    @Invoker("setTimestamp") void accessor$setTimestamp(long timestamp);
 
 }

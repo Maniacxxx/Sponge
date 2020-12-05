@@ -126,6 +126,7 @@ public abstract class WorldMixin_API<W extends World<W>> implements World<W>, Au
     @Shadow public abstract void shadow$setTileEntity(BlockPos pos, @javax.annotation.Nullable TileEntity tileEntityIn);
     @Shadow public abstract void removeTileEntity(BlockPos pos);
 
+    @Shadow @Final protected AbstractChunkProvider chunkProvider;
     private Context impl$context;
 
     // World

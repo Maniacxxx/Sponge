@@ -22,19 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.common.accessor.world.server;
+package org.spongepowered.common.mixin.api.mcp.world.server;
 
-import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.server.ServerChunkProvider;
-import net.minecraft.world.server.TicketManager;
+import net.minecraft.world.server.Ticket;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(ServerChunkProvider.class)
-public interface ServerChunkProviderAccessor {
-
-    @Accessor("generator") void accessor$setChunkGenerator(ChunkGenerator<?> generator);
-
-    @Accessor("ticketManager") TicketManager accessor$getTicketManager();
-
+@Mixin(Ticket.class)
+public abstract class TicketMixin_API implements org.spongepowered.api.world.server.ticket.Ticket {
 }
