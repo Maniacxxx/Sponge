@@ -30,6 +30,7 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.server.TicketManager;
 import net.minecraft.world.server.TicketType;
 import org.spongepowered.api.util.Ticks;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.server.Ticket;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -46,7 +47,9 @@ import org.spongepowered.common.util.VecHelper;
 import org.spongepowered.common.world.server.SpongeTicketType;
 import org.spongepowered.math.vector.Vector3i;
 
+import java.util.Collection;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Mixin(TicketManager.class)
 public abstract class TicketManagerMixin implements TicketManagerBridge {
@@ -96,13 +99,14 @@ public abstract class TicketManagerMixin implements TicketManagerBridge {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <S, T> Optional<Ticket<T>> bridge$registerTicket(final SpongeTicketType<S, T> ticketType, final Vector3i pos, final T value, final int distanceLimit) {
+    public <S, T> Optional<Ticket<T>> bridge$registerTicket(
+            final ServerWorld world, final SpongeTicketType<S, T> ticketType, final Vector3i pos, final T value, final int distanceLimit) {
         final TicketType<S> type = ticketType.getWrappedType();
         final net.minecraft.world.server.Ticket<?> ticketToRequest =
                 TicketAccessor.accessor$createInstance(
                         type,
                         Constants.ChunkTicket.MAXIMUM_CHUNK_TICKET_LEVEL - distanceLimit,
-                        ticketType.getNativeType(value));
+                        ticketType.getNativeType(value, world));
         this.shadow$register(VecHelper.toChunkPos(pos).asLong(), ticketToRequest);
         return Optional.of((Ticket<T>) (Object) ticketToRequest);
     }
@@ -118,9 +122,19 @@ public abstract class TicketManagerMixin implements TicketManagerBridge {
         return false;
     }
 
+    @SuppressWarnings({ "ConstantConditions", "unchecked" })
+    @Override
+    public <S, T> Collection<Ticket<T>> bridge$getTickets(final SpongeTicketType<S, T> ticketType) {
+        return this.tickets.values().stream()
+                .flatMap(x -> x.stream().filter(ticket -> ticket.getType().equals(ticketType.getWrappedType())))
+                .map(x -> (Ticket<T>) (Object) x)
+                .collect(Collectors.toList());
+    }
+
+    @SuppressWarnings("ConstantConditions")
     @Inject(method = "register(JLnet/minecraft/world/server/Ticket;)V", at = @At("HEAD"))
-    private void impl$addChunkPosToTicket(final long chunkPos, final Ticket<?> ticket, final CallbackInfo ci) {
-        ((TicketBridge) ticket).bridge$setChunkPosition(chunkPos);
+    private void impl$addChunkPosToTicket(final long chunkPos, final net.minecraft.world.server.Ticket<?> ticket, final CallbackInfo ci) {
+        ((TicketBridge) (Object) ticket).bridge$setChunkPosition(chunkPos);
     }
 
 }

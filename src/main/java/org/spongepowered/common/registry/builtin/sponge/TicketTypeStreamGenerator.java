@@ -24,6 +24,8 @@
  */
 package org.spongepowered.common.registry.builtin.sponge;
 
+import net.minecraft.world.server.ServerWorld;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.world.server.TicketType;
 import org.spongepowered.common.world.server.SpongeTicketType;
 
@@ -36,7 +38,11 @@ public final class TicketTypeStreamGenerator {
 
     public static Stream<TicketType<?>> stream() {
         return Stream.of(
-                SpongeTicketType.createForChunkPos(net.minecraft.world.server.TicketType.FORCED)
+                SpongeTicketType.createForChunkPos(net.minecraft.world.server.TicketType.FORCED),
+                SpongeTicketType.createForBlockPos(net.minecraft.world.server.TicketType.PORTAL),
+                new SpongeTicketType<Integer, Entity>(net.minecraft.world.server.TicketType.POST_TELEPORT,
+                        (spongeType, serverWorld) -> ((net.minecraft.entity.Entity) spongeType).getEntityId(),
+                        (nativeType, serverWorld) -> (Entity) ((ServerWorld) serverWorld).getEntityByID(nativeType))
         );
     }
 }
