@@ -85,7 +85,7 @@ public final class SpongeTicketType<S, T> implements TicketType<T> {
     }
 
     @Override
-    public Ticks getTicketLifetime() {
+    public Ticks getLifetime() {
         return this.lifetime;
     }
 

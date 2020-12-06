@@ -26,12 +26,13 @@ package org.spongepowered.common.mixin.api.mcp.world.server;
 
 import net.minecraft.world.server.ChunkManager;
 import org.spongepowered.api.util.Ticks;
+import org.spongepowered.api.world.server.ServerWorld;
 import org.spongepowered.api.world.server.Ticket;
 import org.spongepowered.api.world.server.TicketType;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.common.bridge.world.server.ChunkManagerBridge;
-import org.spongepowered.common.util.Constants;
-import org.spongepowered.common.util.SpongeTicks;
 import org.spongepowered.common.world.server.SpongeTicketType;
 import org.spongepowered.math.vector.Vector3i;
 
@@ -40,14 +41,16 @@ import java.util.Optional;
 @Mixin(ChunkManager.class)
 public abstract class ChunkManagerMixin_API implements org.spongepowered.api.world.server.ChunkManager {
 
+    @Shadow @Final private net.minecraft.world.server.ServerWorld world;
+
     @Override
-    public boolean isValid(final Ticket<?> ticket) {
-        return ((ChunkManagerBridge) this).bridge$getTicketManager().bridge$checkTicketValid(ticket);
+    public ServerWorld getWorld() {
+        return (ServerWorld) this.world;
     }
 
     @Override
-    public Ticks getDefaultTicketLifetime(final TicketType<?> ticketType) {
-        return new SpongeTicks(((SpongeTicketType<?, ?>) ticketType).getWrappedType().getLifespan());
+    public boolean isValid(final Ticket<?> ticket) {
+        return ((ChunkManagerBridge) this).bridge$getTicketManager().bridge$checkTicketValid(ticket);
     }
 
     @Override
@@ -56,9 +59,12 @@ public abstract class ChunkManagerMixin_API implements org.spongepowered.api.wor
     }
 
     @Override
-    public <T> Optional<Ticket<T>> requestTicket(final TicketType<T> type, final Vector3i chunkPosition, final T value) {
+    public <T> Optional<Ticket<T>> requestTicket(final TicketType<T> type, final Vector3i chunkPosition, final T value, final int radius) {
+        if (radius < 1) {
+            throw new IllegalArgumentException("The radius must be positive.");
+        }
         return ((ChunkManagerBridge) this).bridge$getTicketManager()
-                .bridge$registerTicket((SpongeTicketType<?, T>) type, chunkPosition, value, Constants.ChunkTicket.DEFAULT_CHUNK_TICKET_DISTANCE);
+                .bridge$registerTicket((SpongeTicketType<?, T>) type, chunkPosition, value, radius);
     }
 
     @Override
