@@ -28,5 +28,5 @@ import net.minecraft.world.server.Ticket;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(Ticket.class)
-public abstract class TicketMixin_API implements org.spongepowered.api.world.server.ticket.Ticket {
+public abstract class TicketMixin_API<T> implements org.spongepowered.api.world.server.Ticket<T> {
 }

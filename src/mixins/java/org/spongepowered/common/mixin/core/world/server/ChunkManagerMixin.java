@@ -37,6 +37,11 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.common.accessor.world.server.ServerChunkProviderAccessor;
+import org.spongepowered.common.accessor.world.server.ServerWorldAccessor;
+import org.spongepowered.common.bridge.world.ServerWorldBridge;
+import org.spongepowered.common.bridge.world.TicketManagerBridge;
+import org.spongepowered.common.bridge.world.server.ChunkManagerBridge;
 import org.spongepowered.common.bridge.world.storage.WorldInfoBridge;
 
 import java.io.IOException;
@@ -44,13 +49,20 @@ import java.io.IOException;
 import javax.annotation.Nullable;
 
 @Mixin(ChunkManager.class)
-public abstract class ChunkManagerMixin {
+public abstract class ChunkManagerMixin implements ChunkManagerBridge {
 
     // @formatter:off
     @Shadow @Final private ServerWorld world;
     @Shadow protected abstract boolean shadow$chunkSave(IChunk chunkIn);
     @Shadow @Nullable protected abstract CompoundNBT loadChunkData(ChunkPos pos) throws IOException;
     // @formatter:on
+
+    @Override
+    public TicketManagerBridge bridge$getTicketManager() {
+        // The ticket manager on this object is a package-private class and isn't accessible from here
+        // - @Shadow doesn't work because it seems to need the exact type.
+        return (TicketManagerBridge) ((ServerChunkProviderAccessor) this.world.getChunkProvider()).accessor$getTicketManager();
+    }
 
     @Redirect(method = "chunkSave", at = @At(value = "INVOKE", target = "Lnet/minecraft/village/PointOfInterestManager;saveIfDirty(Lnet/minecraft/util/math/ChunkPos;)V"))
     private void impl$useSerializationBehaviorForPOI(PointOfInterestManager pointOfInterestManager, ChunkPos p_219112_1_) {

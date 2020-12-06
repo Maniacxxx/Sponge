@@ -22,25 +22,21 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.common.accessor.world.server;
+package org.spongepowered.common.registry.builtin.sponge;
 
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import net.minecraft.world.gen.ChunkGenerator;
-import net.minecraft.world.server.ChunkHolder;
-import net.minecraft.world.server.ChunkManager;
-import net.minecraft.world.server.TicketManager;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.gen.Accessor;
-import org.spongepowered.asm.mixin.gen.Invoker;
+import org.spongepowered.api.world.server.TicketType;
+import org.spongepowered.common.world.server.SpongeTicketType;
 
-@Mixin(ChunkManager.class)
-public interface ChunkManagerAccessor {
+import java.util.stream.Stream;
 
-    @Accessor("entities") Int2ObjectMap<EntityTrackerAccessor> accessor$getEntityTrackers();
+public final class TicketTypeStreamGenerator {
 
-    @Accessor("generator") void accessor$setChunkGenerator(ChunkGenerator<?> chunkGenerator);
+    private TicketTypeStreamGenerator() {
+    }
 
-    @Invoker("getLoadedChunksIterable") Iterable<ChunkHolder> accessor$getLoadedChunksIterable();
-
-    @Invoker("save") void accessor$save(boolean flush);
+    public static Stream<TicketType<?>> stream() {
+        return Stream.of(
+                SpongeTicketType.createForChunkPos(net.minecraft.world.server.TicketType.FORCED)
+        );
+    }
 }

@@ -166,6 +166,7 @@ import org.spongepowered.api.world.difficulty.Difficulty;
 import org.spongepowered.api.world.dimension.DimensionType;
 import org.spongepowered.api.world.portal.PortalType;
 import org.spongepowered.api.world.schematic.PaletteType;
+import org.spongepowered.api.world.server.TicketType;
 import org.spongepowered.api.world.teleport.TeleportHelperFilter;
 import org.spongepowered.api.world.weather.Weather;
 import org.spongepowered.common.accessor.util.registry.SimpleRegistryAccessor;
@@ -224,6 +225,7 @@ import org.spongepowered.common.registry.builtin.sponge.SelectorSortAlgorithmStr
 import org.spongepowered.common.registry.builtin.sponge.SelectorTypeStreamGenerator;
 import org.spongepowered.common.registry.builtin.sponge.SpawnTypeStreamGenerator;
 import org.spongepowered.common.registry.builtin.sponge.TeleportHelperFilterStreamGenerator;
+import org.spongepowered.common.registry.builtin.sponge.TicketTypeStreamGenerator;
 import org.spongepowered.common.registry.builtin.sponge.WeatherStreamGenerator;
 import org.spongepowered.common.registry.builtin.sponge.WoodTypeStreamGenerator;
 import org.spongepowered.common.registry.builtin.sponge.WorldArchetypeStreamGenerator;
@@ -640,6 +642,7 @@ public final class SpongeCatalogRegistry implements CatalogRegistry {
             .generateRegistry(TeleportHelperFilter.class, ResourceKey.sponge("teleport_helper_filter"), TeleportHelperFilterStreamGenerator.stream(), true, false)
             .generateRegistry(Operation.class, ResourceKey.sponge("block_operation"), BlockOperationStreamGenerator.stream(), true, false)
             .generateRegistry(TransactionType.class, ResourceKey.sponge("transaction_type"), BlockTransactionTypeStreamGenerator.stream(), true, false)
+            .generateRegistry(TicketType.class, ResourceKey.sponge("ticket_type"), TicketTypeStreamGenerator.stream(), true, false)
         ;
 
         this

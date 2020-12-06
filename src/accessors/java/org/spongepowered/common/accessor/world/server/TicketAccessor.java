@@ -29,14 +29,13 @@ import net.minecraft.world.server.TicketType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
-import sun.jvm.hotspot.utilities.AssertionFailure;
 
 @Mixin(Ticket.class)
 public interface TicketAccessor<T> {
 
     @Invoker("<init>")
     static <T> Ticket<T> accessor$createInstance(final TicketType<T> p_i226095_1_, final int p_i226095_2_, final T p_i226095_3_) {
-        throw new AssertionFailure("This shouldn't be callable");
+        throw new AssertionError("This shouldn't be callable");
     }
 
     @Accessor("timestamp") long accessor$getTimestamp();

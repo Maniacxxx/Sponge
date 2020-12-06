@@ -57,7 +57,7 @@ import org.spongepowered.api.scheduler.ScheduledUpdateList;
 import org.spongepowered.api.util.Ticks;
 import org.spongepowered.api.world.ChunkRegenerateFlag;
 import org.spongepowered.api.world.ServerLocation;
-import org.spongepowered.api.world.server.ticket.TicketManager;
+import org.spongepowered.api.world.server.ChunkManager;
 import org.spongepowered.api.world.storage.WorldProperties;
 import org.spongepowered.api.world.storage.WorldStorage;
 import org.spongepowered.api.world.weather.Weather;
@@ -68,7 +68,6 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.util.PrettyPrinter;
 import org.spongepowered.common.SpongeCommon;
 import org.spongepowered.common.accessor.world.raid.RaidManagerAccessor;
-import org.spongepowered.common.accessor.world.server.ServerChunkProviderAccessor;
 import org.spongepowered.common.accessor.world.storage.SaveHandlerAccessor;
 import org.spongepowered.common.bridge.world.ServerWorldBridge;
 import org.spongepowered.common.data.SpongeDataManager;
@@ -317,8 +316,8 @@ public abstract class ServerWorldMixin_API extends WorldMixin_API<org.spongepowe
     }
 
     @Override
-    public TicketManager getTicketManager() {
-        return (TicketManager) ((ServerChunkProviderAccessor) this.shadow$getChunkProvider()).accessor$getTicketManager();
+    public ChunkManager getChunkManager() {
+        return (ChunkManager) this.shadow$getChunkProvider().chunkManager;
     }
 
 }
