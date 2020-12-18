@@ -30,22 +30,24 @@ import net.minecraft.network.play.server.SRespawnPacket;
 import net.minecraft.util.RegistryKey;
 import net.minecraft.world.GameType;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldType;
-import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraft.world.storage.WorldInfo;
 import org.spongepowered.api.entity.living.player.server.ServerPlayer;
 import org.spongepowered.api.world.dimension.DimensionType;
 import org.spongepowered.api.world.dimension.DimensionTypes;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.common.bridge.entity.EntityBridge;
 import org.spongepowered.common.bridge.entity.player.ServerPlayerEntityBridge;
 import org.spongepowered.common.entity.player.ClientType;
 import org.spongepowered.common.network.packet.ChangeViewerEnvironmentPacket;
 import org.spongepowered.common.network.packet.SpongePacketHandler;
+import org.spongepowered.common.world.portal.VanillaPortalPlatformTeleporter;
+
+import javax.annotation.Nullable;
 
 @Mixin(ServerPlayerEntity.class)
-public abstract class ServerPlayerEntityMixin_Vanilla implements ServerPlayerEntityBridge  {
+public abstract class ServerPlayerEntityMixin_Vanilla extends EntityMixin_Vanilla implements ServerPlayerEntityBridge  {
 
     @Shadow public abstract ServerWorld shadow$getLevel();
 
@@ -79,6 +81,27 @@ public abstract class ServerPlayerEntityMixin_Vanilla implements ServerPlayerEnt
             this.vanilla$hackChangeVanillaClientDimension(dimensionType, WorldInfo.byHashing(this.shadow$getLevel().getSeed()), generator,
                 gameType, false);
         }
+    }
+
+    /**
+     * @author dualspiral - 18th December 2020 - 1.16.4
+     * @reason Redirects the vanilla changeDimension method to our own
+     *         to support our event and other logic (see
+     *         ServerPlayerEntityMixin on the common mixin sourceset for
+     *         details).
+     *
+     *         This method does not explicitly exist on SeverPlayerEntity
+     *         on Forge, it is an overridden method in Vanilla so needs doing
+     *         here as well as in EntityMixin_Vanilla.
+     *
+     *         This will get called on the nether dimension changes, as the
+     *         end portal teleport call itself has been redirected to provide
+     *         the correct type.
+     */
+    @Overwrite
+    @Nullable
+    public net.minecraft.entity.Entity changeDimension(final ServerWorld target) {
+        return ((EntityBridge) this).bridge$changeDimension(target, VanillaPortalPlatformTeleporter.getNetherInstance());
     }
 
     private void vanilla$hackChangeVanillaClientDimension(final SpongeDimensionType logicType, final long seed, final WorldType generator,

@@ -22,23 +22,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.common.event.tracking.phase.entity;
+package org.spongepowered.common.mixin.core.block;
 
-import org.spongepowered.common.event.tracking.IPhaseState;
+import net.minecraft.block.EndPortalBlock;
+import net.minecraft.entity.Entity;
+import net.minecraft.world.server.ServerWorld;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.Redirect;
+import org.spongepowered.common.bridge.entity.EntityBridge;
+import org.spongepowered.common.world.portal.VanillaPortalPlatformTeleporter;
 
-public final class EntityPhase {
+@Mixin(EndPortalBlock.class)
+public abstract class EndPortalBlockMixin {
 
-    public static final class State {
-        public static final IPhaseState<BasicEntityContext> PLAYER_WAKE_UP = new PlayerWakeUpState();
-        public static final IPhaseState<BasicEntityContext> COLLISION = new EntityCollisionState();
-        public static final IPhaseState<TeleportContext> PORTAL_DIMENSION_CHANGE = new TeleportPhaseState();
-
-        private State() {
-        }
-    }
-
-
-    private EntityPhase() {
+    @Redirect(method = "entityInside", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;changeDimension"
+            + "(Lnet/minecraft/world/server/ServerWorld;)Lnet/minecraft/entity/Entity;"))
+    private Entity impl$useEndPortalTeleporterWhenTeleporting(final Entity entity, final ServerWorld p_241206_1_) {
+        return ((EntityBridge) entity).bridge$changeDimension(p_241206_1_, VanillaPortalPlatformTeleporter.getEndInstance());
     }
 
 }

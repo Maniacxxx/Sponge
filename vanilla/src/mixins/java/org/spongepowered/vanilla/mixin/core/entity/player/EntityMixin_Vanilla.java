@@ -22,23 +22,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.common.event.tracking.phase.entity;
+package org.spongepowered.vanilla.mixin.core.entity.player;
 
-import org.spongepowered.common.event.tracking.IPhaseState;
+import net.minecraft.entity.Entity;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
+import org.spongepowered.common.bridge.entity.EntityBridge;
+import org.spongepowered.common.world.portal.PlatformTeleporter;
+import org.spongepowered.common.world.portal.VanillaPortalPlatformTeleporter;
 
-public final class EntityPhase {
+import javax.annotation.Nullable;
 
-    public static final class State {
-        public static final IPhaseState<BasicEntityContext> PLAYER_WAKE_UP = new PlayerWakeUpState();
-        public static final IPhaseState<BasicEntityContext> COLLISION = new EntityCollisionState();
-        public static final IPhaseState<TeleportContext> PORTAL_DIMENSION_CHANGE = new TeleportPhaseState();
+@Mixin(Entity.class)
+public abstract class EntityMixin_Vanilla implements EntityBridge {
 
-        private State() {
-        }
-    }
-
-
-    private EntityPhase() {
+    /**
+     * @author dualspiral - 19th December 2020 - 1.16.4
+     * @reason Overwrite to redirect call to
+     *         {@link #bridge$changeDimension(net.minecraft.world.server.ServerWorld, PlatformTeleporter)}, this
+     *         is to support Forge mods and their ITeleporter
+     *
+     *         Forge will require it's own PlatformTeleporter
+     */
+    @Overwrite
+    @Nullable
+    public Entity changeDimension(final net.minecraft.world.server.ServerWorld originalDestinationWorld) {
+        // We've redirected the End versions, so we're going to use the nether one.
+        return this.bridge$changeDimension(originalDestinationWorld, VanillaPortalPlatformTeleporter.getNetherInstance());
     }
 
 }

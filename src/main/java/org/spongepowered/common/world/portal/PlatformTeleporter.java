@@ -22,23 +22,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.common.event.tracking.phase.entity;
+package org.spongepowered.common.world.portal;
 
-import org.spongepowered.common.event.tracking.IPhaseState;
+import net.minecraft.block.PortalInfo;
+import net.minecraft.entity.Entity;
+import net.minecraft.world.server.ServerWorld;
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.spongepowered.api.event.cause.entity.MovementType;
+import org.spongepowered.api.world.portal.PortalType;
+import org.spongepowered.math.vector.Vector3d;
 
-public final class EntityPhase {
+import java.util.function.Function;
 
-    public static final class State {
-        public static final IPhaseState<BasicEntityContext> PLAYER_WAKE_UP = new PlayerWakeUpState();
-        public static final IPhaseState<BasicEntityContext> COLLISION = new EntityCollisionState();
-        public static final IPhaseState<TeleportContext> PORTAL_DIMENSION_CHANGE = new TeleportPhaseState();
+/**
+ * For wrapping around Forge's ITeleporter
+ */
+public interface PlatformTeleporter {
 
-        private State() {
-        }
-    }
+    @Nullable
+    PortalInfo getPortalInfo(Entity entity, ServerWorld currentWorld, ServerWorld targetWorld, Vector3d currentPosition);
 
+    // Implementor note: the final function Boolean is true if a portal exists
+    @Nullable
+    Entity performTeleport(Entity entity, ServerWorld currentWorld, ServerWorld targetWorld, float xRot, Function<Boolean, Entity> teleportLogic);
 
-    private EntityPhase() {
-    }
+    // This isn't if it's a vanilla portal - it's if it's vanilla(ish) logic.
+    boolean isVanilla();
+
+    MovementType getMovementType();
+
+    PortalType getPortalType();
 
 }

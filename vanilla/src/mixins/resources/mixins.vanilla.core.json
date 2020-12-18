@@ -19,6 +19,7 @@
     ],
     "mixins": [
         "crash.CrashReportMixin_Vanilla",
+        "entity.player.EntityMixin_Vanilla",
         "entity.player.ServerPlayerEntityMixin_Vanilla",
         "network.login.ServerLoginNetHandler_1Mixin_Vanilla",
         "network.login.ServerLoginNetHandlerMixin_Vanilla",
